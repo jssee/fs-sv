@@ -1,0 +1,6 @@
+{
+  "extends": "@fs-sv/config/tsconfig.base.json",
+  "compilerOptions": {
+    "strictNullChecks": true
+  }
+}

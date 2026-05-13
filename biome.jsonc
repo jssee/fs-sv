@@ -1,0 +1,183 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "!**/.next",
+      "!**/dist",
+      "!**/.turbo",
+      "!**/.nx",
+      "!**/dev-dist",
+      "!**/.zed",
+      "!**/.vscode",
+      "!**/routeTree.gen.ts",
+      "!**/src-tauri",
+      "!**/.nuxt",
+      "!bts.jsonc",
+      "!**/.expo",
+      "!**/.wrangler",
+      "!**/.alchemy",
+      "!**/.svelte-kit",
+      "!**/wrangler.jsonc",
+      "!**/.source",
+      "!**/convex/_generated"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "tab"
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "useExhaustiveDependencies": "info"
+      },
+      "nursery": {
+        // Disabled: too noisy for Tailwind class sorting (211 warnings), and nursery rules are unstable
+        "useSortedClasses": "off"
+      },
+      "style": {
+        "noParameterAssign": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error",
+        // Disabled globally: UI component barrel pattern is standard in this codebase
+        "noExportedImports": "info"
+      },
+      "performance": {
+        // Disabled globally: barrel files are intentional for component APIs
+        "noBarrelFile": "info"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "overrides": [
+    {
+      // Svelte/Vue framework files have different conventions
+      "includes": ["**/*.svelte", "**/*.vue"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useConst": "off",
+            "useImportType": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off",
+            // Snippet parameters from framework components may be intentionally unused
+            "noUnusedFunctionParameters": "off"
+          }
+        }
+      }
+    },
+    {
+      // Component index.ts files re-export subcomponents as a public API
+      "includes": ["apps/web/src/lib/components/ui/**/index.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noExportedImports": "off"
+          },
+          "performance": {
+            "noBarrelFile": "off"
+          }
+        }
+      }
+    },
+    {
+      // SvelteKit convention: declare global namespace for type augmentation
+      "includes": ["apps/web/src/app.d.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNamespace": "off"
+          }
+        }
+      }
+    },
+    {
+      // Database and auth packages use namespace imports for schema objects
+      // (required by Drizzle and Better Auth patterns, not tree-shaking issues)
+      "includes": ["packages/db/**", "packages/auth/**"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noNamespaceImport": "off"
+          }
+        }
+      }
+    },
+    {
+      // Component library adaptations for bits-ui and other headless UI libraries
+      "includes": ["apps/web/src/lib/components/**"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            // bits-ui components manage their own button types
+            "useButtonType": "off",
+            // Complex ARIA role compositions managed by component internals
+            "useAriaPropsForRole": "off"
+          },
+          "performance": {
+            // Component imports from headless UI libraries use namespace pattern
+            "noNamespaceImport": "off"
+          },
+          "style": {
+            // Loop variables like 'error' are intentional in component context
+            "noRestrictedGlobals": "off"
+          },
+          "suspicious": {
+            // Generic adapters (data-table, chart) legitimately use any for unknown payloads
+            "noExplicitAny": "off",
+            // Component default props may be intentionally empty (no-op defaults)
+            "noEmptyBlockStatements": "off",
+            // Type evolution in component setup is acceptable
+            "noEvolvingTypes": "off",
+            // Cookie operations in sidebar context are necessary
+            "noDocumentCookie": "off",
+            // Assignment expressions in complex render conditions are readable
+            "noAssignInExpressions": "off",
+            // Error/Set are imported components, not globals being shadowed
+            "noShadowRestrictedNames": "off"
+          },
+          "complexity": {
+            // Snippet parameter destructuring patterns may not use all fields
+            "noUselessRename": "off",
+            // Comma operators in conditional chains improve readability
+            "noCommaOperator": "off"
+          }
+        }
+      }
+    }
+  ],
+  "extends": ["ultracite/biome/core", "ultracite/biome/svelte"]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@fs-sv/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@fs-sv/db": "workspace:*",
+    "@fs-sv/env": "workspace:*",
+    "better-auth": "catalog:",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@fs-sv/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

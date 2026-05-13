@@ -1,0 +1,53 @@
+{
+  "name": "fs-sv",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "catalog": {
+      "dotenv": "^17.2.2",
+      "typescript": "^6",
+      "@types/node": "^22.13.14",
+      "@orpc/server": "^1.13.14",
+      "@orpc/openapi": "^1.13.14",
+      "@orpc/contract": "^1.13.14",
+      "better-auth": "1.6.9",
+      "valibot": "^1.3.1",
+      "@orpc/valibot": "^1.13.14"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:web": "turbo -F web dev",
+    "db:push": "turbo -F @fs-sv/db db:push",
+    "db:studio": "turbo -F @fs-sv/db db:studio",
+    "db:generate": "turbo -F @fs-sv/db db:generate",
+    "db:migrate": "turbo -F @fs-sv/db db:migrate",
+    "db:start": "turbo -F @fs-sv/db db:start",
+    "db:watch": "turbo -F @fs-sv/db db:watch",
+    "db:stop": "turbo -F @fs-sv/db db:stop",
+    "db:down": "turbo -F @fs-sv/db db:down",
+    "check": "ultracite check",
+    "fix": "ultracite fix"
+  },
+  "dependencies": {
+    "@fs-sv/env": "workspace:*",
+    "dotenv": "catalog:",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@fs-sv/config": "workspace:*",
+    "@biomejs/biome": "2.4.14",
+    "@types/node": "catalog:",
+    "lefthook": "latest",
+    "turbo": "^2.8.12",
+    "typescript": "catalog:",
+    "ultracite": "7.6.3"
+  },
+  "packageManager": "bun@1.3.8"
+}

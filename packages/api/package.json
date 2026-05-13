@@ -1,0 +1,23 @@
+{
+  "name": "@fs-sv/api",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/router.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@fs-sv/auth": "workspace:*",
+    "@orpc/contract": "catalog:",
+    "@orpc/server": "catalog:",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@fs-sv/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
