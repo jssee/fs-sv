@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { signUp } from "$lib/auth.remote";
+	import { signUp } from "$lib/auth/forms.remote";
 	import { Button } from "$lib/components/ui/button";
 	import {
 		Card,
