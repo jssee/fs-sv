@@ -1,8 +1,8 @@
 import type { RequestHandler } from "@sveltejs/kit";
 import { handleApiReference } from "$lib/server/api/handler";
 
-const handle: RequestHandler = async ({ request }) => {
-	const result = await handleApiReference(request);
+const handle: RequestHandler = async ({ locals, request }) => {
+	const result = await handleApiReference(request, locals.log);
 
 	if (!result.matched) {
 		return new Response("Not found", { status: 404 });

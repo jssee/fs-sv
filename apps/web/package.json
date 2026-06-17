@@ -19,7 +19,7 @@
     "@orpc/server": "catalog:",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
-    "evlog": "^2.14.1",
+    "evlog": "catalog:",
     "valibot": "catalog:",
     "@orpc/valibot": "catalog:"
   },

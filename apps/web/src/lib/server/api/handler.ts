@@ -2,17 +2,11 @@ import { createContext } from "@fs-sv/api/context";
 import { appRouter } from "@fs-sv/api/router";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
-import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { experimental_ValibotToJsonSchemaConverter as ValibotToJsonSchemaConverter } from "@orpc/valibot";
+import type { RequestLogger } from "evlog";
 
-const rpcHandler = new RPCHandler(appRouter, {
-	interceptors: [
-		onError((error) => {
-			console.error(error);
-		}),
-	],
-});
+const rpcHandler = new RPCHandler(appRouter);
 
 const apiHandler = new OpenAPIHandler(appRouter, {
 	plugins: [
@@ -20,16 +14,12 @@ const apiHandler = new OpenAPIHandler(appRouter, {
 			schemaConverters: [new ValibotToJsonSchemaConverter()],
 		}),
 	],
-	interceptors: [
-		onError((error) => {
-			console.error(error);
-		}),
-	],
 });
 
-export const handleRpc = async (request: Request) => {
+export const handleRpc = async (request: Request, log: RequestLogger) => {
 	const context = await createContext({
 		headers: request.headers,
+		log,
 	});
 
 	return rpcHandler.handle(request, {
@@ -38,9 +28,13 @@ export const handleRpc = async (request: Request) => {
 	});
 };
 
-export const handleApiReference = async (request: Request) => {
+export const handleApiReference = async (
+	request: Request,
+	log: RequestLogger
+) => {
 	const context = await createContext({
 		headers: request.headers,
+		log,
 	});
 
 	return apiHandler.handle(request, {

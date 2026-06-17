@@ -1,8 +1,8 @@
 import type { RequestHandler } from "@sveltejs/kit";
 import { handleRpc } from "$lib/server/api/handler";
 
-const handle: RequestHandler = async ({ request }) => {
-	const result = await handleRpc(request);
+const handle: RequestHandler = async ({ locals, request }) => {
+	const result = await handleRpc(request, locals.log);
 
 	if (!result.matched) {
 		return new Response("Not found", { status: 404 });
