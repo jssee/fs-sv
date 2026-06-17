@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { getAuthErrorCode } from "@fs-sv/auth/errors";
+	import { log } from "evlog/client";
 	import { goto } from "$app/navigation";
 	import { authClient } from "$lib/auth/client";
 	import { Button } from "$lib/components/ui/button";
@@ -13,7 +15,13 @@
 					goto("/");
 				},
 				onError: (error) => {
-					console.error("Sign out failed:", error);
+					log.error({
+						client: {
+							action: "auth.sign_out",
+							outcome: "failure",
+							reasonCode: getAuthErrorCode(error) ?? "unknown",
+						},
+					});
 				},
 			},
 		});
