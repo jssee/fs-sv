@@ -99,4 +99,5 @@ Common components live in `apps/web/src/lib/components/ui`. The template keeps a
 ## More docs
 
 - [`docs/BOUNDARIES.md`](docs/BOUNDARIES.md) — architecture rules to keep feature work from drifting
+- [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) — evlog conventions for request, API, auth, and client logs
 - [`AGENTS.md`](AGENTS.md) — project rules for coding agents
