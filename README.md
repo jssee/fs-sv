@@ -58,7 +58,8 @@ Open <http://localhost:5173>.
 bun run dev          # run all dev tasks
 bun run dev:web      # run only the SvelteKit app
 bun run build        # build all packages/apps
-bun run check        # run Ultracite checks
+bun run check        # typecheck app and packages
+bun run lint         # run Ultracite checks
 bun run fix          # format and fix lint issues
 
 bun run db:start     # start local Postgres with Docker

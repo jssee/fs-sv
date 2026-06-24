@@ -23,7 +23,7 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "check-types": "turbo check-types",
+    "check": "turbo check",
     "dev:web": "turbo -F web dev",
     "db:push": "turbo -F @fs-sv/db db:push",
     "db:studio": "turbo -F @fs-sv/db db:studio",
@@ -33,7 +33,7 @@
     "db:watch": "turbo -F @fs-sv/db db:watch",
     "db:stop": "turbo -F @fs-sv/db db:stop",
     "db:down": "turbo -F @fs-sv/db db:down",
-    "check": "ultracite check",
+    "lint": "ultracite check",
     "fix": "ultracite fix"
   },
   "dependencies": {
