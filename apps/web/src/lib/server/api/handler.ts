@@ -1,10 +1,45 @@
-import { createContext } from "@fs-sv/api/context";
+import { type Context, createContext } from "@fs-sv/api/context";
 import { appRouter } from "@fs-sv/api/router";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
-import { RPCHandler } from "@orpc/server/fetch";
+import { type FetchHandler, RPCHandler } from "@orpc/server/fetch";
 import { experimental_ValibotToJsonSchemaConverter as ValibotToJsonSchemaConverter } from "@orpc/valibot";
-import type { RequestLogger } from "evlog";
+import type { RequestHandler } from "@sveltejs/kit";
+
+type ApiRouteHandlers = Record<
+	"HEAD" | "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS",
+	RequestHandler
+>;
+
+const createRouteHandlers = (
+	fetchHandler: FetchHandler<Context>,
+	prefix: `/${string}`
+): ApiRouteHandlers => {
+	const handle: RequestHandler = async ({ locals, request }) => {
+		const context = await createContext({
+			headers: request.headers,
+			log: locals.log,
+		});
+
+		const result = await fetchHandler.handle(request, { prefix, context });
+
+		if (!result.matched) {
+			return new Response("Not found", { status: 404 });
+		}
+
+		return result.response;
+	};
+
+	return {
+		HEAD: handle,
+		GET: handle,
+		POST: handle,
+		PUT: handle,
+		PATCH: handle,
+		DELETE: handle,
+		OPTIONS: handle,
+	};
+};
 
 const rpcHandler = new RPCHandler(appRouter);
 
@@ -16,29 +51,8 @@ const apiHandler = new OpenAPIHandler(appRouter, {
 	],
 });
 
-export const handleRpc = async (request: Request, log: RequestLogger) => {
-	const context = await createContext({
-		headers: request.headers,
-		log,
-	});
-
-	return rpcHandler.handle(request, {
-		prefix: "/rpc",
-		context,
-	});
-};
-
-export const handleApiReference = async (
-	request: Request,
-	log: RequestLogger
-) => {
-	const context = await createContext({
-		headers: request.headers,
-		log,
-	});
-
-	return apiHandler.handle(request, {
-		prefix: "/api-reference",
-		context,
-	});
-};
+export const rpcRouteHandlers = createRouteHandlers(rpcHandler, "/rpc");
+export const apiReferenceRouteHandlers = createRouteHandlers(
+	apiHandler,
+	"/api-reference"
+);
