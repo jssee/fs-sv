@@ -4,5 +4,6 @@ export const env = createEnv({
 	clientPrefix: "VITE_",
 	client: {},
 	runtimeEnv: import.meta.env as Record<string, string | undefined>,
+	skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 	emptyStringAsUndefined: true,
 });

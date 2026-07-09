@@ -72,6 +72,34 @@ bun run db:migrate   # run Drizzle migrations
 bun run db:studio    # open Drizzle Studio
 ```
 
+## Deploy to Vercel
+
+The repo ships ready for Vercel via git integration. `vercel.json` pins the web
+service (`apps/web`), installs the whole workspace with Bun, and builds with the
+Vercel SvelteKit adapter.
+
+One-time setup:
+
+1. Import the repo in Vercel. `vercel.json` sets the root, framework, and install
+   command, so no dashboard build config is needed.
+2. Provision a Postgres database and set `DATABASE_URL` to a **transaction-mode
+   pooled** connection string (PgBouncer or your provider's pooler). Any provider
+   works (Railway, Render, Fly, Aiven, RDS + PgBouncer, …).
+3. Set project env vars in Vercel (dashboard, or push your local `.env` with
+   `bun run deploy:setup` then `bun run env:production` / `bun run env:preview`).
+   Set `DATABASE_URL` and `BETTER_AUTH_SECRET`. Leave `BETTER_AUTH_URL` and
+   `CORS_ORIGIN` unset — they default to the deployment's own origin, so preview
+   deployments work without extra config.
+4. Add `DATABASE_URL` (production, pooled) as a GitHub Actions secret so CI can
+   apply migrations.
+
+Migrations are applied by CI, not at build time. On merge to `main`, the
+`migrate` job in `.github/workflows/ci.yml` runs `drizzle-kit migrate` against
+the production database. It runs in parallel with the Vercel deploy, so keep
+migrations **expand-only** (add columns/tables before code depends on them);
+this also keeps the shared preview database compatible. Commit generated
+migration files (`bun run db:generate`); `db:push` stays for local development.
+
 ## Code tour
 
 ```txt
