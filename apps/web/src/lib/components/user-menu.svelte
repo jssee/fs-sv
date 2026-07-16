@@ -1,18 +1,20 @@
 <script lang="ts">
+	import type { Session } from "@fs-sv/auth";
 	import { getAuthErrorCode } from "@fs-sv/auth/errors";
 	import { log } from "evlog/client";
 	import { goto } from "$app/navigation";
 	import { authClient } from "$lib/auth/client";
 	import { Button } from "$lib/components/ui/button";
-	import { Skeleton } from "$lib/components/ui/skeleton";
 
-	const sessionQuery = authClient.useSession();
+	const { user }: { user: Session["user"] | null } = $props();
 
 	async function handleSignOut() {
 		await authClient.signOut({
 			fetchOptions: {
 				onSuccess: () => {
-					goto("/");
+					// The header renders the server session, so reload load
+					// functions to pick up the cleared session.
+					goto("/", { invalidateAll: true });
 				},
 				onError: (error) => {
 					log.error({
@@ -33,10 +35,7 @@
 </script>
 
 <div class="relative">
-	{#if $sessionQuery.isPending}
-		<Skeleton class="h-8 w-24" />
-	{:else if $sessionQuery.data?.user}
-		{@const user = $sessionQuery.data.user}
+	{#if user}
 		<div class="flex items-center gap-3">
 			<span
 				class="hidden text-muted-foreground text-sm sm:inline"

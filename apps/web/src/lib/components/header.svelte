@@ -1,7 +1,10 @@
 <script lang="ts">
+	import type { Session } from "@fs-sv/auth";
 	import { mode, toggleMode } from "mode-watcher";
 	import { Button } from "$lib/components/ui/button";
 	import UserMenu from "./user-menu.svelte";
+
+	const { user }: { user: Session["user"] | null } = $props();
 </script>
 
 <header class="border-b">
@@ -14,7 +17,7 @@
 			<Button variant="outline" size="sm" onclick={toggleMode}>
 				{mode.current === "dark" ? "Light" : "Dark"}
 			</Button>
-			<UserMenu />
+			<UserMenu {user} />
 		</div>
 	</div>
 </header>
