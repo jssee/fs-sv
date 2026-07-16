@@ -4,19 +4,15 @@
 	import { goto } from "$app/navigation";
 	import { page } from "$app/state";
 	import { getAuthMessage } from "$lib/auth/messages";
+	import { sanitizeRedirect } from "$lib/auth/redirect";
 	import SignInForm from "$lib/components/sign-in-form.svelte";
 	import SignUpForm from "$lib/components/sign-up-form.svelte";
 
 	const isSignUp = $derived(page.params.authtype === "signup");
 
-	const redirectTo = $derived.by(() => {
-		const raw = page.url.searchParams.get("redirectTo");
-		return raw?.startsWith("/") &&
-			!raw.startsWith("//") &&
-			!raw.startsWith("\\")
-			? raw
-			: null;
-	});
+	const redirectTo = $derived(
+		sanitizeRedirect(page.url.searchParams.get("redirectTo"), page.url)
+	);
 
 	const message = $derived.by(() =>
 		getAuthMessage(page.url.searchParams.get("message"))

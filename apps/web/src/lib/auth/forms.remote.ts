@@ -4,6 +4,7 @@ import { invalid, redirect } from "@sveltejs/kit";
 import { maskEmail } from "evlog/better-auth";
 import { form, getRequestEvent } from "$app/server";
 import { auth } from "$lib/auth";
+import { sanitizeRedirect } from "$lib/auth/redirect";
 
 export const signIn = form(signInSchema, async ({ email, password }) => {
 	const { locals, url } = getRequestEvent();
@@ -36,7 +37,7 @@ export const signIn = form(signInSchema, async ({ email, password }) => {
 
 	redirect(
 		303,
-		sanitizeRedirect(url.searchParams.get("redirectTo"), url, "/dashboard")
+		sanitizeRedirect(url.searchParams.get("redirectTo"), url) ?? "/dashboard"
 	);
 });
 
@@ -71,40 +72,6 @@ export const signUp = form(signUpSchema, async ({ name, email, password }) => {
 
 	redirect(
 		303,
-		sanitizeRedirect(url.searchParams.get("redirectTo"), url, "/dashboard")
+		sanitizeRedirect(url.searchParams.get("redirectTo"), url) ?? "/dashboard"
 	);
 });
-
-const sanitizeRedirect = (
-	redirectTo: string | null,
-	baseUrl: URL,
-	fallback: string
-) => {
-	if (!redirectTo) {
-		return fallback;
-	}
-
-	if (
-		!redirectTo.startsWith("/") ||
-		redirectTo.startsWith("//") ||
-		redirectTo.startsWith("\\")
-	) {
-		return fallback;
-	}
-
-	try {
-		const target = new URL(redirectTo, baseUrl);
-
-		if (target.origin !== baseUrl.origin) {
-			return fallback;
-		}
-
-		if (!target.pathname.startsWith("/")) {
-			return fallback;
-		}
-
-		return `${target.pathname}${target.search}${target.hash}`;
-	} catch {
-		return fallback;
-	}
-};
