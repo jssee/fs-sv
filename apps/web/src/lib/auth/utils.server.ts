@@ -1,15 +1,11 @@
-import { redirect } from "@sveltejs/kit";
-import { auth } from "$lib/auth";
+import { type RequestEvent, redirect } from "@sveltejs/kit";
 import type { AuthMessageCode } from "./messages";
 
-export async function requireSession(
-	request: Request,
-	url: URL,
+export function requireSession(
+	{ locals, url }: Pick<RequestEvent, "locals" | "url">,
 	messageCode?: AuthMessageCode
 ) {
-	const session = await auth.api.getSession({ headers: request.headers });
-
-	if (!session) {
+	if (!locals.session) {
 		const params = new URLSearchParams({
 			redirectTo: `${url.pathname}${url.search}`,
 		});
@@ -21,5 +17,5 @@ export async function requireSession(
 		redirect(303, `/signin?${params}`);
 	}
 
-	return session;
+	return locals.session;
 }

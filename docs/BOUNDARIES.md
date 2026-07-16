@@ -22,9 +22,11 @@ Owns SvelteKit concerns:
 - load functions and remote functions
 - form UX and user-facing messages
 
-Use `createApi(request)` from `$lib/server/api` when a load function or remote function needs server data. Remote functions should create the API client, call one API procedure, and translate UI errors.
+The session is resolved once per request in `hooks.server.ts` and lives on `locals.session`. Feature code reads it from there instead of calling `auth.api.getSession`.
 
-For protected pages, use `requireSession(request, url, messageCode)` from `$lib/auth/utils.server`. Add static message codes in `$lib/auth/messages.ts`.
+Use `createApi(locals)` from `$lib/server/api` when a load function or remote function needs server data. Remote functions should create the API client, call one API procedure, and translate UI errors.
+
+For protected pages, use `requireSession(event, messageCode)` from `$lib/auth/utils.server`. Add static message codes in `$lib/auth/messages.ts`.
 
 ### `packages/api`
 

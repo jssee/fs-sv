@@ -1,44 +1,35 @@
 import type { Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
-import {
-	type BetterAuthInstance,
-	createAuthMiddleware,
-} from "evlog/better-auth";
+import { identifyUser } from "evlog/better-auth";
 import { createEvlogHooks } from "evlog/sveltekit";
 import { building } from "$app/environment";
 import { auth } from "$lib/auth";
 
 const { handle: evlogHandle, handleError } = createEvlogHooks();
 
-const identifyUser = createAuthMiddleware(auth as BetterAuthInstance, {
-	exclude: ["/api/auth/**"],
-	maskEmail: true,
-});
+// Resolve the Better Auth session once per request. Everything downstream —
+// requireSession, createApi, log enrichment — reads locals.session instead of
+// hitting the database again. Better Auth's own endpoints are skipped; they
+// manage sessions themselves.
+const sessionHandle: Handle = async ({ event, resolve }) => {
+	event.locals.session = event.url.pathname.startsWith("/api/auth/")
+		? null
+		: await auth.api.getSession({ headers: event.request.headers });
 
-const evlogAuthHandle: Handle = async ({ event, resolve }) => {
-	await identifyUser(
-		event.locals.log,
-		event.request.headers,
-		event.url.pathname
-	);
+	if (event.locals.session) {
+		identifyUser(event.locals.log, event.locals.session, { maskEmail: true });
+	}
+
 	return resolve(event);
 };
 
-const authHandle: Handle = ({ event, resolve }) => {
-	const authInstance = auth;
-
-	return svelteKitHandler({
-		event,
-		resolve,
-		auth: authInstance,
-		building,
-	});
-};
+const authHandle: Handle = ({ event, resolve }) =>
+	svelteKitHandler({ event, resolve, auth, building });
 
 export const handle = sequence(
 	evlogHandle as Handle,
-	evlogAuthHandle,
+	sessionHandle,
 	authHandle
 );
 export { handleError };

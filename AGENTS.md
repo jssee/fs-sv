@@ -9,8 +9,9 @@
 
 - Web adapts; API decides. UI code renders state and collects input. Server behavior belongs behind API procedures.
 - Remote functions stay thin: create the API client, call one API procedure, and translate UI errors.
-- Use `createApi(request)` from `$lib/server/api` in load functions and remote functions.
-- For protected pages, use `requireSession(request, url, messageCode)` from `$lib/auth/utils.server`; add message codes in `$lib/auth/messages.ts`.
+- Use `createApi(locals)` from `$lib/server/api` in load functions and remote functions.
+- For protected pages, use `requireSession(event, messageCode)` from `$lib/auth/utils.server`; add message codes in `$lib/auth/messages.ts`.
+- The session is resolved once per request in `hooks.server.ts` and lives on `locals.session`; do not call `auth.api.getSession` in feature code.
 - Add API payload shapes in `packages/api/src/schema.ts`, expose them through `contract.ts`, and wire handlers in `router.ts`.
 - Import database schema/client from `@fs-sv/db`; do not create feature-local database clients.
 - Add env vars to `packages/env` before reading them elsewhere.

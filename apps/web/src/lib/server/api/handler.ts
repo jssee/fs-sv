@@ -1,4 +1,4 @@
-import { type Context, createContext } from "@fs-sv/api/context";
+import type { Context } from "@fs-sv/api/context";
 import { appRouter } from "@fs-sv/api/router";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
@@ -16,12 +16,10 @@ const createRouteHandlers = (
 	prefix: `/${string}`
 ): ApiRouteHandlers => {
 	const handle: RequestHandler = async ({ locals, request }) => {
-		const context = await createContext({
-			headers: request.headers,
-			log: locals.log,
+		const result = await fetchHandler.handle(request, {
+			prefix,
+			context: { log: locals.log, session: locals.session },
 		});
-
-		const result = await fetchHandler.handle(request, { prefix, context });
 
 		if (!result.matched) {
 			return new Response("Not found", { status: 404 });

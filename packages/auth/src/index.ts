@@ -6,6 +6,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 type CreateAuthOptions = Pick<BetterAuthOptions, "plugins">;
 
+export type Session = ReturnType<typeof createAuth>["$Infer"]["Session"];
+
 export function createAuth({ plugins = [] }: CreateAuthOptions = {}) {
 	const db = createDb();
 
@@ -23,5 +25,3 @@ export function createAuth({ plugins = [] }: CreateAuthOptions = {}) {
 		plugins,
 	});
 }
-
-export const auth = createAuth();

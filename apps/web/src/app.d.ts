@@ -1,3 +1,4 @@
+import type { Session } from "@fs-sv/auth";
 import type { RequestLogger } from "evlog";
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
@@ -7,6 +8,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			log: RequestLogger;
+			session: Session | null;
 		}
 		// interface PageData {}
 		// interface PageState {}
