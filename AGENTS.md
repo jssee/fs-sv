@@ -1,34 +1,27 @@
 # Project Rules
 
-## Landmarks
+## Boundaries
 
-- Read `docs/BOUNDARIES.md` before changes that cross `apps/web` and `packages/*`.
-- UI components live in `apps/web/src/lib/components/ui`. Add shadcn-svelte components only when a feature needs them.
+- Web adapts; API decides. `apps/web` owns SvelteKit and UI concerns; `packages/api` owns validation, authorization, and server behavior.
+- `packages/db` owns Drizzle schema, migrations, and the shared database client. Import database schema and clients from `@fs-sv/db`; do not access the database directly from `apps/web`.
+- `packages/env` owns environment validation. Add variables there before reading them elsewhere.
+- `packages/auth` owns shared authentication setup, schemas, and error helpers.
+- Add dependencies, UI components, and abstractions only when a current feature requires them.
+- When ownership is unclear, keep code in the layer that already owns the concern.
 
-## Feature patterns
+## Cross-cutting rules
 
-- Web adapts; API decides. UI code renders state and collects input. Server behavior belongs behind API procedures.
-- Remote functions stay thin: create the API client, call one API procedure, and translate UI errors.
-- Use `createApi(locals)` from `$lib/server/api` in load functions and remote functions.
-- For protected pages, use `requireSession(event, messageCode)` from `$lib/auth/utils.server`; add message codes in `$lib/auth/messages.ts`.
-- The session is resolved once per request in `hooks.server.ts` and lives on `locals.session`; do not call `auth.api.getSession` in feature code.
-- Add API payload shapes in `packages/api/src/schema.ts`, expose them through `contract.ts`, and wire handlers in `router.ts`.
-- Import database schema/client from `@fs-sv/db`; do not create feature-local database clients.
-- Add env vars to `packages/env` before reading them elsewhere.
 - Do not add tests for things that should be handled by the type system.
+- Follow `docs/OBSERVABILITY.md` for request logging, sensitive data, and audit events.
 
----
-
-## Use Biome
+## Verification
 
 Biome's linter will catch most issues automatically. Focus your attention on:
 
-1. **Business logic correctness** - Biome can't validate your algorithms
-2. **Meaningful naming** - Use descriptive names for functions, variables, and types
-3. **Architecture decisions** - Component structure, data flow, and API design
-4. **Edge cases** - Handle boundary conditions and error states
-5. **User experience** - Accessibility, performance, and usability considerations
+- **Business logic correctness** - Biome can't validate your algorithms
+- **Meaningful naming** - Use descriptive names for functions, variables, and types
+- **Architecture decisions** - Component structure, data flow, and API design
+- **Edge cases** - Handle boundary conditions and error states
+- **User experience** - Accessibility, performance, and usability considerations
 
----
-
-Most formatting and common issues are automatically fixed by Biome. Run `bun x ultracite fix` before committing to ensure compliance.
+Skipping pre-commit hooks is forbidden unless explicitly given permission.

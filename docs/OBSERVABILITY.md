@@ -1,6 +1,6 @@
 # Observability
 
-This template uses evlog as a first-class app boundary. Keep one simple rule in mind:
+This app uses evlog as a first-class boundary. Keep one simple rule in mind:
 
 > One SvelteKit request event, enriched everywhere, emitted once.
 
@@ -65,4 +65,4 @@ Do not log raw request bodies, passwords, tokens, API keys, full emails, payment
 
 ## Production drains
 
-External drains are intentionally not configured in this template yet. The app should run locally without Axiom, OTLP, Better Stack, or another paid service. Add drain configuration later without changing application logging call sites.
+External drains are intentionally not configured yet. The app should run locally without Axiom, OTLP, Better Stack, or another paid service. Add drain configuration later without changing application logging call sites.
