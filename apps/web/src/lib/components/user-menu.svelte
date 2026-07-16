@@ -1,37 +1,9 @@
 <script lang="ts">
 	import type { Session } from "@fs-sv/auth";
-	import { getAuthErrorCode } from "@fs-sv/auth/errors";
-	import { log } from "evlog/client";
-	import { goto } from "$app/navigation";
-	import { authClient } from "$lib/auth/client";
+	import { signOut } from "$lib/auth/forms.remote";
 	import { Button } from "$lib/components/ui/button";
 
 	const { user }: { user: Session["user"] | null } = $props();
-
-	async function handleSignOut() {
-		await authClient.signOut({
-			fetchOptions: {
-				onSuccess: () => {
-					// The header renders the server session, so reload load
-					// functions to pick up the cleared session.
-					goto("/", { invalidateAll: true });
-				},
-				onError: (error) => {
-					log.error({
-						client: {
-							action: "auth.sign_out",
-							outcome: "failure",
-							reasonCode: getAuthErrorCode(error) ?? "unknown",
-						},
-					});
-				},
-			},
-		});
-	}
-
-	function goToLogin() {
-		goto("/signin");
-	}
 </script>
 
 <div class="relative">
@@ -43,11 +15,18 @@
 			>
 				{user.name || user.email?.split("@")[0] || "User"}
 			</span>
-			<Button variant="destructive" size="sm" onclick={handleSignOut}
-				>Sign Out</Button
-			>
+			<form {...signOut}>
+				<Button
+					type="submit"
+					variant="destructive"
+					size="sm"
+					disabled={signOut.pending > 0}
+				>
+					Sign Out
+				</Button>
+			</form>
 		</div>
 	{:else}
-		<Button size="sm" onclick={goToLogin}>Sign In</Button>
+		<Button size="sm" href="/signin">Sign In</Button>
 	{/if}
 </div>

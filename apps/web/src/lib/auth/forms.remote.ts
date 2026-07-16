@@ -75,3 +75,28 @@ export const signUp = form(signUpSchema, async ({ name, email, password }) => {
 		sanitizeRedirect(url.searchParams.get("redirectTo"), url) ?? "/dashboard"
 	);
 });
+
+export const signOut = form(async () => {
+	const { locals, request } = getRequestEvent();
+
+	try {
+		await auth.api.signOut({ headers: request.headers });
+
+		locals.log.set({
+			auth: { action: "sign_out", outcome: "success" },
+		});
+	} catch (error) {
+		// A failure means the session was already gone; the redirect still
+		// lands the user in a signed-out UI, so don't surface an error.
+		locals.log.setLevel("warn");
+		locals.log.set({
+			auth: {
+				action: "sign_out",
+				outcome: "failure",
+				reasonCode: getAuthErrorCode(error) ?? "unknown",
+			},
+		});
+	}
+
+	redirect(303, "/");
+});
