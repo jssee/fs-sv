@@ -6,11 +6,10 @@
 - `packages/db` owns Drizzle schema, migrations, and the shared database client. Import database schema and clients from `@fs-sv/db`; do not access the database directly from `apps/web`.
 - `packages/env` owns environment validation. Add variables there before reading them elsewhere.
 - `packages/auth` owns shared authentication setup, schemas, and error helpers.
-- Add dependencies, UI components, and abstractions only when a current feature requires them.
+
+## Conventions
+
 - When ownership is unclear, keep code in the layer that already owns the concern.
-
-## Cross-cutting rules
-
 - Do not add tests for things that should be handled by the type system.
 - Follow `docs/OBSERVABILITY.md` for request logging, sensitive data, and audit events.
 
