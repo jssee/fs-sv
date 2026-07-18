@@ -20,8 +20,3 @@
 - Let contract validation handle malformed input and middleware handle missing authentication.
 - Use stable oRPC error codes for expected domain outcomes; allow unexpected infrastructure errors to propagate.
 - Enrich the request through `context.log`; do not import framework-specific log accessors.
-- Follow `docs/OBSERVABILITY.md` for logging and sensitive-data rules.
-
-## Verification
-
-- Run `bun run --cwd packages/api check` after changing schemas, contracts, middleware, or handlers.

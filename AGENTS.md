@@ -15,12 +15,5 @@
 
 ## Verification
 
-Biome's linter will catch most issues automatically. Focus your attention on:
-
-- **Business logic correctness** - Biome can't validate your algorithms
-- **Meaningful naming** - Use descriptive names for functions, variables, and types
-- **Architecture decisions** - Component structure, data flow, and API design
-- **Edge cases** - Handle boundary conditions and error states
-- **User experience** - Accessibility, performance, and usability considerations
-
-Skipping pre-commit hooks is forbidden unless explicitly given permission.
+- The pre-commit hook runs Biome (lint/format) only; it never type-checks. Run `bun run check` after code changes.
+- Skipping pre-commit hooks is forbidden unless explicitly given permission.
