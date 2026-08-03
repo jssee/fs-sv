@@ -4,7 +4,7 @@
 
 - Web adapts; API decides. `apps/web` owns SvelteKit and UI concerns; `packages/api` owns validation, authorization, and server behavior.
 - `packages/db` owns Drizzle schema, migrations, and the shared database client. Import database schema and clients from `@fs-sv/db`; do not access the database directly from `apps/web`.
-- `packages/env` owns environment validation. Add variables there before reading them elsewhere.
+- `apps/web/.env.schema` owns runtime environment validation. Access its generated types through `varlock/env` in the web app and pass configuration into shared packages explicitly.
 - `packages/auth` owns shared authentication setup, schemas, and error helpers.
 
 ## Conventions

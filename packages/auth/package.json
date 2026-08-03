@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "@fs-sv/db": "workspace:*",
-    "@fs-sv/env": "workspace:*",
     "better-auth": "catalog:",
     "valibot": "catalog:"
   },

@@ -28,7 +28,7 @@ const SKIP_DIRS = new Set([
 	"build",
 ]);
 const FILE_RE = /\.(json|jsonc|toml|md|ts|tsx|js|mjs|cjs|svelte|yml|yaml|env)$/;
-const EXTRA_FILES = new Set([".env", ".env.example", "docker-compose.yml"]);
+const EXTRA_FILES = new Set([".env", ".env.schema", "docker-compose.yml"]);
 
 const newName = process.argv[2];
 if (!(newName && /^[a-z][a-z0-9-]*$/.test(newName))) {

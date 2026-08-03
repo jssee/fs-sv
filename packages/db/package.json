@@ -11,18 +11,16 @@
   },
   "scripts": {
     "check": "tsc --noEmit -p tsconfig.json",
-    "db:push": "drizzle-kit push",
-    "db:generate": "drizzle-kit generate",
-    "db:studio": "drizzle-kit studio",
-    "db:migrate": "drizzle-kit migrate",
+    "db:push": "varlock run --inject vars --path ../../apps/web/ --filter=DATABASE_URL -- drizzle-kit push",
+    "db:generate": "varlock run --inject vars --path ../../apps/web/ --filter=DATABASE_URL -- drizzle-kit generate",
+    "db:studio": "varlock run --inject vars --path ../../apps/web/ --filter=DATABASE_URL -- drizzle-kit studio",
+    "db:migrate": "varlock run --inject vars --path ../../apps/web/ --filter=DATABASE_URL -- drizzle-kit migrate",
     "db:start": "docker compose up -d",
     "db:watch": "docker compose up",
     "db:stop": "docker compose stop",
     "db:down": "docker compose down"
   },
   "dependencies": {
-    "@fs-sv/env": "workspace:*",
-    "dotenv": "catalog:",
     "drizzle-orm": "^0.45.1",
     "pg": "^8.17.1"
   },
@@ -30,6 +28,7 @@
     "@fs-sv/config": "workspace:*",
     "@types/pg": "^8.16.0",
     "drizzle-kit": "^0.31.8",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "varlock": "catalog:"
   }
 }

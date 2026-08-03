@@ -7,21 +7,21 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "prepare": "svelte-kit sync || echo ''",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+    "prepare": "varlock codegen && (svelte-kit sync || echo '')",
+    "check": "varlock codegen && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "env:check": "varlock load --agent"
   },
   "dependencies": {
     "@fs-sv/api": "workspace:*",
     "@fs-sv/auth": "workspace:*",
-    "@fs-sv/env": "workspace:*",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "better-auth": "catalog:",
-    "dotenv": "catalog:",
     "evlog": "catalog:",
     "valibot": "catalog:",
-    "@orpc/valibot": "catalog:"
+    "@orpc/valibot": "catalog:",
+    "varlock": "catalog:"
   },
   "devDependencies": {
     "@fs-sv/config": "workspace:*",
@@ -29,6 +29,7 @@
     "@hugeicons/core-free-icons": "^4.1.1",
     "@hugeicons/svelte": "^1.1.2",
     "@internationalized/date": "^3.12.0",
+    "@varlock/vite-integration": "catalog:",
     "@sveltejs/adapter-vercel": "^6.3.4",
     "@sveltejs/kit": "^2.68.0",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",

@@ -10,6 +10,7 @@ A SvelteKit monorepo template with typed APIs, PostgreSQL, auth, and a small UI 
 - PostgreSQL and Drizzle ORM
 - Tailwind CSS and shadcn-svelte components
 - Bun and Turborepo
+- Varlock environment validation
 - Ultracite/Biome
 
 ## Quick start
@@ -28,7 +29,7 @@ Then install dependencies:
 bun install
 ```
 
-Create `apps/web/.env`:
+Create `apps/web/.env.local`:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/fs-sv
@@ -59,6 +60,7 @@ bun run dev          # run all dev tasks
 bun run dev:web      # run only the SvelteKit app
 bun run build        # build all packages/apps
 bun run check        # typecheck app and packages
+bun run env:check    # validate environment configuration
 bun run lint         # run Ultracite checks
 bun run fix          # format and fix lint issues
 
@@ -85,12 +87,19 @@ One-time setup:
 2. Provision a Postgres database and set `DATABASE_URL` to a **transaction-mode
    pooled** connection string (PgBouncer or your provider's pooler). Any provider
    works (Railway, Render, Fly, Aiven, RDS + PgBouncer, …).
-3. Set project env vars in Vercel (dashboard, or push your local `.env` with
-   `bun run deploy:setup` then `bun run env:production` / `bun run env:preview`).
-   Set `DATABASE_URL` and `BETTER_AUTH_SECRET`. Leave `BETTER_AUTH_URL` and
-   `CORS_ORIGIN` unset — they default to the deployment's own origin, so preview
-   deployments work without extra config.
-4. Add `DATABASE_URL` (production, pooled) as a GitHub Actions secret so CI can
+3. Set `DATABASE_URL` and `BETTER_AUTH_SECRET` as project environment variables
+   for preview and production. Leave `BETTER_AUTH_URL` and `CORS_ORIGIN` unset —
+   Varlock derives them from the deployment's own origin, so previews work
+   without extra configuration.
+4. Generate separate `_VARLOCK_ENV_KEY` values for preview and production so
+   Varlock can encrypt the resolved server environment embedded by the build:
+
+   ```bash
+   bunx varlock generate-key --plain | bunx vercel env add _VARLOCK_ENV_KEY preview --sensitive
+   bunx varlock generate-key --plain | bunx vercel env add _VARLOCK_ENV_KEY production --sensitive
+   ```
+
+5. Add `DATABASE_URL` (production, pooled) as a GitHub Actions secret so CI can
    apply migrations.
 
 Migrations are applied by CI, not at build time. On merge to `main`, the
@@ -112,14 +121,11 @@ packages/api
 packages/db
   Drizzle schema and database client
 
-packages/env
-  typed env validation
-
 packages/auth
   shared auth helpers and schemas
 ```
 
-Feature work usually starts in `apps/web` and crosses into `packages/api` when it needs server-side behavior. Data access belongs in `packages/db`; env access belongs in `packages/env`.
+Feature work usually starts in `apps/web` and crosses into `packages/api` when it needs server-side behavior. Data access belongs in `packages/db`; runtime environment configuration is declared in `apps/web/.env.schema` and passed into shared packages explicitly.
 
 ## UI components
 

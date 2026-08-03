@@ -1,4 +1,3 @@
-import { env } from "@fs-sv/env/server";
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 
 import * as schema from "./schema";
@@ -9,9 +8,7 @@ import * as schema from "./schema";
 // database's connection limit.
 let client: NodePgDatabase<typeof schema> | undefined;
 
-export function createDb() {
-	client ??= drizzle(env.DATABASE_URL, { schema });
+export function createDb(databaseUrl: string) {
+	client ??= drizzle(databaseUrl, { schema });
 	return client;
 }
-
-export const db = createDb();
