@@ -2,7 +2,7 @@ import { ORPCError, os } from "@orpc/server";
 
 import type { Context } from "../context";
 
-export const requireAuthMiddleware = os
+export const requireAuth = os
 	.$context<Context>()
 	.middleware(({ context, next }) => {
 		if (!context.session?.user) {

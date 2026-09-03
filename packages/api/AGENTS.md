@@ -12,7 +12,7 @@
 
 ## Authentication and authorization
 
-- `protectedProcedure` establishes authentication, not resource authorization. Handlers that access resources enforce authorization themselves.
+- `authed` establishes authentication, not resource authorization. Handlers that access resources enforce authorization themselves.
 - Derive the actor ID from `context.session` and pass that ID into feature behavior; client input is never authoritative for owner or user identity.
 - Scope owner-controlled resources by actor ID in the database query.
 - Return `NOT_FOUND` for both missing and inaccessible owner-scoped resources unless the product explicitly requires otherwise.

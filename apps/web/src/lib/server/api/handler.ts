@@ -1,9 +1,10 @@
 import type { Context } from "@fs-sv/api/context";
-import { appRouter } from "@fs-sv/api/router";
+import { router } from "@fs-sv/api/router";
+import { OpenAPIGenerator } from "@orpc/openapi";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
-import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
+import { OpenAPIReferenceHandlerPlugin } from "@orpc/openapi/plugins";
 import { type FetchHandler, RPCHandler } from "@orpc/server/fetch";
-import { experimental_ValibotToJsonSchemaConverter as ValibotToJsonSchemaConverter } from "@orpc/valibot";
+import { ValibotToJsonSchemaConverter } from "@orpc/valibot";
 import type { RequestHandler } from "@sveltejs/kit";
 
 type ApiRouteHandlers = Record<
@@ -39,18 +40,21 @@ const createRouteHandlers = (
 	};
 };
 
-const rpcHandler = new RPCHandler(appRouter);
+const rpcHandler = new RPCHandler(router);
+const generator = new OpenAPIGenerator({
+	converters: [new ValibotToJsonSchemaConverter()],
+});
 
-const apiHandler = new OpenAPIHandler(appRouter, {
+const openAPIHandler = new OpenAPIHandler(router, {
 	plugins: [
-		new OpenAPIReferencePlugin({
-			schemaConverters: [new ValibotToJsonSchemaConverter()],
+		new OpenAPIReferenceHandlerPlugin({
+			spec: () => generator.generate(router),
 		}),
 	],
 });
 
 export const rpcRouteHandlers = createRouteHandlers(rpcHandler, "/rpc");
 export const apiReferenceRouteHandlers = createRouteHandlers(
-	apiHandler,
+	openAPIHandler,
 	"/api-reference"
 );
