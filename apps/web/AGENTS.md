@@ -1,14 +1,17 @@
 # Web App Rules
 
-## Boundaries
+## Server boundaries
 
-- Keep SvelteKit concepts and UI error translation in this app; server decisions stay behind API procedures.
-- `$lib/components/ui` is shadcn-managed; add components via the shadcn-svelte CLI, do not hand-edit them.
+- Keep SvelteKit routing, form handling, and UI error translation in this app. Product decisions and authorization stay behind API procedures.
+- Product remote functions are thin adapters: obtain `locals` with `getRequestEvent()`, call one procedure through `createApi(locals)`, and translate expected failures into SvelteKit or UI outcomes.
+- Auth remote forms are the protocol adapter for Better Auth. Keep them under `$lib/auth`, call the shared `auth` instance, and reuse schemas and error helpers from `@fs-sv/auth`, following `$lib/auth/forms.remote.ts`.
 
-## Conventions
+## Sessions
 
-- Remote functions call one procedure through `createApi(locals)` and translate errors for the UI; group them per feature domain, following `$lib/auth/forms.remote.ts`.
 - Read the session resolved by `hooks.server.ts` from `locals.session`; do not call `auth.api.getSession` in feature code.
 - Use `requireSession(event, messageCode)` from `$lib/auth/utils.server` for protected pages; define user-facing message codes statically, as in `$lib/auth/messages.ts`.
-- Prefer shadcn-svelte components over custom UI; feature-specific components live in `$lib/components`.
-- Avoid tailwind arbitrary values, adhere to design system tokens.
+
+## UI
+
+- Use shadcn-svelte for reusable primitives. Add them through the shadcn-svelte CLI under `$lib/components/ui`; keep feature-specific composition in `$lib/components` rather than hand-editing managed primitives.
+- Use design-system tokens for Tailwind styling; introduce a named token when the design needs a new value.

@@ -1,18 +1,16 @@
 # Observability
 
-This app uses evlog as a first-class boundary. Keep one simple rule in mind:
+> One wide event per SvelteKit request: enrich it everywhere, emit it once.
 
-> One SvelteKit request event, enriched everywhere, emitted once.
+## Event ownership
 
-## Request events
+`createEvlogHooks()` in `apps/web/src/hooks.server.ts` creates `locals.log` and emits the event when the response completes. The web API adapter passes that same logger into `packages/api` as `context.log`; the oRPC `evlog()` middleware enriches it with procedure context and errors.
 
-SvelteKit owns request lifecycle logging through `createEvlogHooks()` in `apps/web/src/hooks.server.ts`.
+Keep this app's oRPC handlers unwrapped. Adding `withEvlog()` would create a second lifecycle owner and duplicate the `/rpc` request event.
 
-Do not wrap this app's oRPC handlers with `withEvlog()`. The SvelteKit hook already emits the request event; wrapping `/rpc` handlers would create duplicate events for the same request.
+## Request enrichment
 
-## API logging
-
-`packages/api` receives the request logger through `context.log`. Procedure handlers and middleware should enrich the current request event with business context:
+Enrich the current event with nested business context instead of emitting a separate log for each step. Use `locals.log` in SvelteKit request code and `context.log` in API procedures and middleware:
 
 ```ts
 context.log.set({
@@ -23,7 +21,7 @@ context.log.set({
 });
 ```
 
-Use `context.log` in API code. Do not import framework-specific log accessors such as `useLogger()` into `packages/api`; those belong to app adapters like SvelteKit. If the API is later deployed as a standalone service, that deployment can choose its own emitting boundary.
+Keep framework-specific log accessors such as `useLogger()` in app adapters; pass the logger explicitly into shared packages.
 
 ## Auth events
 
@@ -38,15 +36,13 @@ auth: {
 }
 ```
 
-Never log raw passwords, request bodies, raw emails, auth tokens, session payloads, or raw Better Auth errors for expected auth failures.
-
-Better Auth request enrichment should keep `maskEmail: true` enabled.
+Map expected Better Auth failures to stable `reasonCode` values before logging them. Keep `maskEmail: true` enabled when `identifyUser()` enriches a request.
 
 ## Client logs
 
-Browser logs are untrusted input. Client code may send narrow diagnostic events through `/api/logs`, but the server route must whitelist fields and nest them under `client`.
+Browser logs are untrusted input. The client transport sends warning and error events to `/api/logs`; keep that route origin-checked and schema-validated. Select accepted fields explicitly and nest them under `client` rather than spreading the request body onto the server event.
 
-Do not trust client-provided identity, user, session, service, audit, or status fields. Server-side request enrichment decides identity from cookies/session.
+Server-side request enrichment decides identity and request status. Ignore client-provided identity, user, session, service, audit, and status fields.
 
 ## Audit events
 
@@ -59,10 +55,10 @@ Use normal business fields for routine app outcomes. Reserve `log.audit()` for s
 - data export
 - authorization denials that need a compliance trail
 
-## PII and secrets
+## Data policy
 
-Do not log raw request bodies, passwords, tokens, API keys, full emails, payment data, or full third-party error payloads. Prefer stable IDs, reason codes, statuses, counts, and masked values.
+Log stable IDs, reason codes, statuses, counts, and masked values. Keep raw request bodies, passwords, tokens, API keys, full emails, payment data, session payloads, and full third-party error payloads out of events.
 
 ## Production drains
 
-External drains are intentionally not configured yet. The app should run locally without Axiom, OTLP, Better Stack, or another paid service. Add drain configuration later without changing application logging call sites.
+External drains are intentionally not configured. Keep the app usable locally without Axiom, OTLP, Better Stack, or another paid service. Add drains at the configuration boundary without changing application logging call sites.

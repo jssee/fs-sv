@@ -1,17 +1,17 @@
-# Project Rules
+# Repository Rules
 
-## Boundaries
+## Architecture
 
-- Web adapts; API decides. `apps/web` owns SvelteKit and UI concerns; `packages/api` owns validation, authorization, and server behavior.
-- `packages/db` owns Drizzle schema, migrations, and the shared database client. Import database schema and clients from `@fs-sv/db`; do not access the database directly from `apps/web`.
-- `apps/web/.env.schema` owns runtime environment validation. Access its generated types through `varlock/env` in the web app and pass configuration into shared packages explicitly.
-- `packages/auth` owns shared authentication setup, schemas, and error helpers.
+- Web adapts; API decides. `apps/web` owns SvelteKit routing, rendering, form UX, and transport adapters. `packages/api` owns public contracts, authorization, and product server behavior.
+- `packages/db` owns the Drizzle schema, migrations, and shared database client. Import them through `@fs-sv/db`; database access stays out of `apps/web`.
+- `packages/auth` owns framework-neutral authentication setup, shared auth schemas, and error helpers. App-specific auth integration stays in `apps/web`.
+- `apps/web/.env.schema` is the runtime configuration source of truth. Read generated values through `varlock/env` in the web app and pass configuration into shared packages explicitly.
 
 ## Conventions
 
-- When ownership is unclear, keep code in the layer that already owns the concern.
-- Do not add tests for things that should be handled by the type system.
-- Follow `docs/OBSERVABILITY.md` for request logging, sensitive data, and audit events.
+- Extend the layer that already owns a concern before introducing a cross-package helper or new layer.
+- Do not add tests for properties that TypeScript already guarantees.
+- Logging: before changing request, API, auth, browser, or audit logging, read `docs/OBSERVABILITY.md`; preserve its event-ownership and data-policy invariants.
 
 ## Verification
 
